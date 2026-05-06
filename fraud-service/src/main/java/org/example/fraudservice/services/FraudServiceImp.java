@@ -41,8 +41,14 @@ public class FraudServiceImp implements FraudService{
         );
     }
 
+
     @Override
     public List<Fraud> showAllFrauds() {
         return new ArrayList<>(fraudRepository.findAll());
+    }
+
+    @Override
+    public List<Fraud> showAllFraudsByAccount(Long id) {
+        return new ArrayList<>(fraudRepository.findByIdAccount(id));
     }
 }

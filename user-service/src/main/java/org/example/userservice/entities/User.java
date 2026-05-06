@@ -17,7 +17,6 @@ public class User {
     @Email
     private String email;
     private String keycloakId ;
-    private String password;
     @Size(min = 10, max = 10)
     private String phoneNumber;
     @Size(min = 8, max = 8)

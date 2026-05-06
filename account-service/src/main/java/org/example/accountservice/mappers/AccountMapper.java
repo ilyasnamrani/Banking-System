@@ -6,6 +6,6 @@ import org.example.accountservice.dtos.AccountResponse;
 import org.example.accountservice.entities.Account;
 
 public interface AccountMapper {
-    public AccountResponse  toAccountResponse(Account account, UserResponseV2 user);
+    public AccountResponse  toAccountResponse(Account account);
     public Account toAccount(AccountRequest accountRequest);
 }

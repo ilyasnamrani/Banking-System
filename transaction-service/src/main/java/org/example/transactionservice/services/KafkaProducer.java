@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service;
 
         public void  sendTransactionSucceed(TransactionResponse transactionResponse){
             transactionResponse.setStatus(Status.TRANSACTION_SUCCESS);
-            kafkaTemplate.send(topicName,transactionResponse.getIdTransaction(),transactionResponse)
+            kafkaTemplate.send(topicName,String.valueOf(transactionResponse.getIdTransaction()),transactionResponse)
                     .whenComplete((result, ex) -> {
                         if (ex == null) {
                             logger.info(" Message{} sent successfully to the  topic {} [Partition: {}, Offset: {}]", transactionResponse.getStatus(), topicName, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service;
 
         public void  sendTransactionInProgress(TransactionResponse transactionResponse){
             transactionResponse.setStatus(Status.TRANSACTION_IN_PROGRESS);
-            kafkaTemplate.send(topicName,transactionResponse.getIdTransaction(),transactionResponse)
+            kafkaTemplate.send(topicName,String.valueOf(transactionResponse.getIdTransaction()),transactionResponse)
                     .whenComplete((result, ex) -> {
                         if (ex == null) {
                             logger.info("  Message{} sent successfully to the  topic {} [Partition: {}, Offset: {}]", transactionResponse.getStatus(), topicName, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());
@@ -57,7 +57,7 @@ import org.springframework.stereotype.Service;
 
         public void  sendTransactionFailed(TransactionResponse transactionResponse){
             transactionResponse.setStatus(Status.TRANSACTION_FAILED);
-            kafkaTemplate.send(topicName,transactionResponse.getIdTransaction(),transactionResponse)
+            kafkaTemplate.send(topicName,String.valueOf(transactionResponse.getIdTransaction()),transactionResponse)
                     .whenComplete((result, ex) -> {
                         if (ex == null) {
                             logger.info(" Message{} sent  successfully to the  topic {} [Partition: {}, Offset: {}]", transactionResponse.getStatus(), topicName, result.getRecordMetadata().partition(), result.getRecordMetadata().offset());

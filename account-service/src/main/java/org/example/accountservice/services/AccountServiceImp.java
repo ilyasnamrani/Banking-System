@@ -2,6 +2,7 @@ package org.example.accountservice.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.accountservice.Models.UserResponseV2;
+import org.example.accountservice.enums.State;
 import org.example.accountservice.dtos.AccountRequest;
 import org.example.accountservice.dtos.AccountResponse;
 import org.example.accountservice.entities.Account;
@@ -31,12 +32,12 @@ public class AccountServiceImp implements AccountService {
      }
     @Override
     public AccountResponse createAccount(AccountRequest account) {
-        return accountMapper.toAccountResponse(accountMapper.toAccount(account),null);
+        return accountMapper.toAccountResponse(accountRepository.save(accountMapper.toAccount(account)));
     }
 
     @Override
     public AccountResponse updateAccount(AccountRequest account, Long idAccount, Jwt jwt) {
-        UserResponseV2 user = userFeignClient.getFeignClientUser(account.getIdUser(),jwt);
+        UserResponseV2 user = userFeignClient.getFeignClientUser(account.getIdUser());
         Account updated = accountRepository.findById(idAccount)
                 .map(existing -> {
                     if(user.getKeycloakId().equals(jwt.getSubject())) {
@@ -51,7 +52,7 @@ public class AccountServiceImp implements AccountService {
                     return accountRepository.save(existing);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Account Not Found with Id : " + idAccount));
-        return accountMapper.toAccountResponse(updated,null);
+        return accountMapper.toAccountResponse(updated);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class AccountServiceImp implements AccountService {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
          );
-        return accountMapper.toAccountResponse(acc,null);
+        return accountMapper.toAccountResponse(acc);
     }
 
     @Override
@@ -72,30 +73,32 @@ public class AccountServiceImp implements AccountService {
           Account acc = accountRepository.findById(idAccount).orElseThrow(
                   () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
           );
-          UserResponseV2 user = userFeignClient.getFeignClientUser(acc.getIdUser(),jwt);
-          if(!user.getKeycloakId().equals(jwt.getSubject())) {
-              throw new AccessDeniedException("Access Denied!");
-              }
+        UserResponseV2 user = userFeignClient.getFeignClientUser(acc.getIdUser());
+        if(!user.getKeycloakId().equals(jwt.getSubject())) {
+            throw new AccessDeniedException("Access Denied!");
+        }
           else  acc.setUser(user);
-        return accountMapper.toAccountResponse(acc,null);
+        return accountMapper.toAccountResponse(acc);
     }
 
     @Override
     public String findAccountByRegistrationId(String registrationId) {
          Account acc = accountRepository.findByRegistrationId(registrationId).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Registration Id : " + registrationId));
-         UserResponseV2 user = acc.getUser();
+         UserResponseV2 user = userFeignClient.getFeignClientUser(acc.getIdUser());
         return "Name :" + user.getFirstName() + " Lastname" + user.getLastName();
     }
 
     @Override
-    public void debit(Long idAccount, Double amount) {
+    public void debit(Long idAccount, Double amount) throws Exception {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
          );
          if(acc.getBalance() >= amount) {
              acc.setBalance(acc.getBalance() - amount);
          }
+         else throw new Exception("Balance insufficient");
+         accountRepository.save(acc);
     }
 
     @Override
@@ -119,7 +122,8 @@ public class AccountServiceImp implements AccountService {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
          );
-         acc.setStatus("DEACTIVATED");
+         acc.setState(State.DEACTIVATED);
+        accountRepository.save(acc);
         return acc.getStatus();
     }
 
@@ -128,19 +132,20 @@ public class AccountServiceImp implements AccountService {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
          );
-         acc.setStatus("ACTIVATED");
+         acc.setState(State.ACTIVATED);
+         accountRepository.save(acc);
         return acc.getStatus() ;
     }
 
     @Override
     public List<AccountResponse> getAllAccountsForUser(Long idUser, Jwt jwt) {
 
-        UserResponseV2 user = userFeignClient.getFeignClientUser(idUser, jwt);
+        UserResponseV2 user = userFeignClient.getFeignClientUser(idUser);
 
         List<Account> accounts = accountRepository.findByIdUser(idUser);
 
         return accounts.stream()
-                .map(acc -> accountMapper.toAccountResponse(acc, user))
+                .map(accountMapper::toAccountResponse)
                 .collect(Collectors.toList());
     }
 
@@ -157,7 +162,7 @@ public class AccountServiceImp implements AccountService {
         return accounts.stream()
                 .map(account -> {
                     UserResponseV2 user = userMap.get(account.getIdUser());
-                    return accountMapper.toAccountResponse(account,user);
+                    return accountMapper.toAccountResponse(account);
                 })
                 .collect(Collectors.toList());
     }

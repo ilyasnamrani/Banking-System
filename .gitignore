@@ -1,0 +1,18 @@
+# IDE files
+.idea/
+*.iml
+
+# Build artifacts
+target/
+*.jar
+*.war
+
+# Environment variables
+.env
+
+# Log files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

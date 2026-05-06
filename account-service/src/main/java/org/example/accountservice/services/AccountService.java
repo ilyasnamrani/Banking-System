@@ -14,7 +14,7 @@ public interface AccountService {
     public AccountResponse getAccountByIdForAdmin(Long idAccount);
     public AccountResponse getAccountForUser(Long idAccount , Jwt jwt) throws AccessDeniedException;
     public String findAccountByRegistrationId(String registrationId);
-    public void debit(Long idAccount , Double amount);
+    public void debit(Long idAccount , Double amount) throws Exception;
     public void credit(Long idAccount , Double amount);
     public void refund(Long idAccount , Double amount);
     public String activateAccount(Long idAccount);

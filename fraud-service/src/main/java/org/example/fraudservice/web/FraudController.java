@@ -10,19 +10,30 @@ import java.util.List;
 @RestController
 @RequestMapping("/frauds")
 public class FraudController {
-    private final FraudService fraudeService ;
+    private final FraudService fraudService ;
 
     public FraudController(FraudService fraudService){
-        this.fraudeService = fraudService;
+        this.fraudService = fraudService;
     }
 
-    @GetMapping("/all/admin")
+    @GetMapping("/admin")
     public List<Fraud> getAllFrauds(){
-        return fraudeService.showAllFrauds();
+        return fraudService.showAllFrauds();
     }
+
 
     @DeleteMapping("/delete/{id}")
     public void deleteFraud( @PathVariable Long id){
+        fraudService.deleteFraud(id);
+    }
+    @GetMapping("/{idFraud}")
+    public Fraud getFraud(@PathVariable Long idFraud){
+        return fraudService.showFraud(idFraud);
+    }
+
+    @GetMapping("/account/{idAccount}")
+    public List<Fraud>  getFrauds(@PathVariable Long idAccount){
+       return  fraudService.showAllFraudsByAccount(idAccount);
     }
 
 }

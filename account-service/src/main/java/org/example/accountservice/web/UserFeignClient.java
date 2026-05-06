@@ -15,7 +15,7 @@ public interface UserFeignClient {
     @GetMapping("/users/feignClients")
     public List<UserResponseV2> getAllFeignClientUsers();
 
-    @GetMapping("/feignClient/{id}")
-    public UserResponseV2 getFeignClientUser(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt);
+    @GetMapping("/users/feignClient/{id}")
+    public UserResponseV2 getFeignClientUser(@PathVariable Long id);
 
 }

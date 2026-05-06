@@ -38,7 +38,6 @@ public class UserMapperImp implements UserMapper {
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setPhoneNumber(userRequest.getPhoneNumber());
-        user.setPassword(userRequest.getPassword());
         user.setCin(userRequest.getCin());
         return user;
     }

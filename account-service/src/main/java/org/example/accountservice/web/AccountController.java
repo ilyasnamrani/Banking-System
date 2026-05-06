@@ -22,7 +22,7 @@ public class AccountController {
         return accountService.getAccountByIdForAdmin(id) ;
     }
 
-    @GetMapping("/user/{idAccount}")
+    @GetMapping("/user/account/{idAccount}")
     public AccountResponse getAccountForUser(@PathVariable Long idAccount, @AuthenticationPrincipal Jwt jwt) throws AccessDeniedException {
         return accountService.getAccountForUser(idAccount,jwt);
     }
@@ -32,9 +32,9 @@ public class AccountController {
         return accountService.getAllAccountsForAdmin();
     }
 
-    @GetMapping("/user/{id}")
-    public List<AccountResponse> getAllAccountsForUser(@PathVariable Long id ,@AuthenticationPrincipal Jwt jwt){
-        return accountService.getAllAccountsForUser(id,jwt);
+    @GetMapping("/user/{idUser}")
+    public List<AccountResponse> getAllAccountsForUser(@PathVariable Long idUser ,@AuthenticationPrincipal Jwt jwt){
+        return accountService.getAllAccountsForUser(idUser,jwt);
     }
 
     @PostMapping("/create")
@@ -62,7 +62,7 @@ public class AccountController {
         return accountService.activateAccount(idAccount);
     }
 
-    @GetMapping("/{regId}")
+    @GetMapping("/registration/{regId}")
     public String getAccountByRegId(@PathVariable String regId){
         return accountService.findAccountByRegistrationId(regId);
     }

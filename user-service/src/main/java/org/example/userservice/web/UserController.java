@@ -29,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping("/feignClient/{id}")
-    public UserResponseV2 getFeignClientUser(@PathVariable Long id,@AuthenticationPrincipal Jwt jwt) throws AccessDeniedException {
-        return userService.getFeignClientUser(id,jwt);
+    public UserResponseV2 getFeignClientUser(@PathVariable Long id){
+        return userService.getFeignClientUser(id);
     }
 
     @GetMapping("/all")
@@ -44,22 +44,24 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public UserResponse createUser(@RequestBody UserRequest userRequest) {
+    public UserResponse createUser(@RequestBody @jakarta.validation.Valid UserRequest userRequest) {
         return userService.createNewUser(userRequest);
     }
 
     @PutMapping("/update/{id}")
-    public UserResponse updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest ,@AuthenticationPrincipal Jwt  jwt) {
+    public UserResponse updateUser(@PathVariable Long id, @RequestBody @jakarta.validation.Valid UserRequest userRequest ,@AuthenticationPrincipal Jwt  jwt) {
         return userService.updateUser(userRequest, id,jwt);
     }
 
     @DeleteMapping("/delete/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+
     }
+
     @GetMapping("/cin")
-    public void getUserByCin(@RequestParam String cin ,@AuthenticationPrincipal Jwt jwt) throws AccessDeniedException {
-        userService.getUserByCin(cin,jwt);
+    public UserResponse getUserByCin(@RequestParam String cin ,@AuthenticationPrincipal Jwt jwt) throws AccessDeniedException {
+       return  userService.getUserByCin(cin,jwt);
     }
 
 }

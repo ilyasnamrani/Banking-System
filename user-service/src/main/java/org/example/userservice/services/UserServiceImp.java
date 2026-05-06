@@ -41,13 +41,10 @@ public class UserServiceImp implements UserService  {
     }
 
     @Override
-    public UserResponseV2 getFeignClientUser(Long userId, Jwt jwt) throws AccessDeniedException {
+    public UserResponseV2 getFeignClientUser(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("User Not Found")
         );
-        if(!jwt.getSubject().equals(user.getKeycloakId())){
-            throw new AccessDeniedException("You cannot access to another account");
-        }
         return userMapper.toUserResponseV2(user);
     }
 
@@ -75,17 +72,25 @@ public class UserServiceImp implements UserService  {
     @Override
     public UserResponse createNewUser(UserRequest userRequest) {
         User user = userMapper.toUser(userRequest);
-        user.setKeycloakId(keycloakService.createUser(user.getEmail(), user.getPassword(),  user.getFirstName(), user.getLastName()));
-        userRepository.save(user);
-        //kafkaService.sendCandidateCreatedEvent(response);
-        return userMapper.toUserResponse(user);
+        user.setKeycloakId(keycloakService.createUser(user.getEmail(), userRequest.getPassword(),  user.getFirstName(), user.getLastName()));
+         UserResponse response = userMapper.toUserResponse(userRepository.save(user));
+        kafkaService.sendCandidateCreatedEvent(response);
+        return response;
     }
 
     @Override
-    public UserResponse updateUser(UserRequest userRequest, Long idUser,Jwt jwt) {
+    public UserResponse updateUser(UserRequest userRequest, Long idUser, Jwt jwt) {
 
         User updated = userRepository.findById(idUser)
                 .map(existing -> {
+
+                    if (!existing.getKeycloakId().equals(jwt.getSubject())) {
+                        try {
+                            throw new AccessDeniedException("You cannot update another user!");
+                        } catch (AccessDeniedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
 
                     if (userRequest.getFirstName() != null && !userRequest.getFirstName().isBlank()) {
                         existing.setFirstName(userRequest.getFirstName());
@@ -99,9 +104,6 @@ public class UserServiceImp implements UserService  {
                         existing.setEmail(userRequest.getEmail());
                     }
 
-                    if (userRequest.getPassword() != null && !userRequest.getPassword().isBlank()) {
-                        existing.setPassword(userRequest.getPassword());
-                    }
 
                     if (userRequest.getCin() != null && !userRequest.getCin().isBlank()) {
                         existing.setCin(userRequest.getCin());
@@ -110,29 +112,26 @@ public class UserServiceImp implements UserService  {
                     if (userRequest.getPhoneNumber() != null && !userRequest.getPhoneNumber().isBlank()) {
                         existing.setPhoneNumber(userRequest.getPhoneNumber());
                     }
-
+                    User savedUser = userRepository.save(existing);
                     keycloakService.updateUser(
-                            existing.getKeycloakId(),
-                            existing.getEmail(),
-                            existing.getFirstName(),
-                            existing.getLastName(),
-                            existing.getPassword()
+                            savedUser.getKeycloakId(),
+                            savedUser.getEmail(),
+                            savedUser.getFirstName(),
+                            savedUser.getLastName(),
+                            userRequest.getPassword()
                     );
-                    if(!existing.getKeycloakId().equals(jwt.getSubject())){
-                        System.out.println("You cannot Update Another User !");
-                    }
-                    return userRepository.save(existing);
+                    kafkaService.sendCandidateUpdatedEvent(userMapper.toUserResponse(savedUser));
+                    return savedUser;
                 })
                 .orElseThrow(() -> new EntityNotFoundException("User Not Found with Id : " + idUser));
-        UserResponse response =  userMapper.toUserResponse(updated);
-//        kafkaService.sendCandidateUpdatedEvent(response);
-        return response;
+
+        return userMapper.toUserResponse(updated);
     }
 
     @Override
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
-//        kafkaService.sendCandidateDeletedEvent(userId);
+        kafkaService.sendCandidateDeletedEvent(userId);
     }
 
 
@@ -142,9 +141,11 @@ public class UserServiceImp implements UserService  {
         if(user == null){
             throw new EntityNotFoundException("User Not Found");
         }
+
         if(!user.getKeycloakId().equals(jwt.getSubject())){
             throw new AccessDeniedException("You don't have the access to other users");
         }
-       return  userMapper.toUserResponse(user);
+         return userMapper.toUserResponse(user);
     }
+
 }

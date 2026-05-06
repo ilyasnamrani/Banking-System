@@ -8,8 +8,9 @@ public interface FraudService {
     public Fraud createFraud(Fraud fraud);
     public void deleteFraud(Long id);
     public Boolean isFraud(Double amount);
-    public Fraud showFraud(Long id);
-    public Fraud showFraudByAccount(Long id,Long idUser);
     public List<Fraud> showAllFrauds();
+    public List<Fraud> showAllFraudsByAccount(Long id);
+    public Fraud showFraud(Long id);
+
 
 }

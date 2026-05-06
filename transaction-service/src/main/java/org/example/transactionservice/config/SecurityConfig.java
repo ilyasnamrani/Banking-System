@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console","/actuator/**","swagger-ui/index.html").permitAll()
-                        .requestMatchers("/transactions/all/admin","/transactions/{id}/admin","/transactions/delete/{id}").hasRole("ADMIN")
+                        .requestMatchers("/frauds/all","/frauds/account/{idAccount}","/frauds/{idFraud}","/frauds/delete/{id}").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .oauth2ResourceServer(oauth -> oauth

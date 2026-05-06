@@ -28,8 +28,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/create","/h2-console","/actuator/**","swagger-ui/index.html").permitAll()
+                        .requestMatchers("/users/create","/h2-console","/actuator/**","swagger-ui/index.html", "/error").permitAll()
                         .requestMatchers("/users/all","/users/delete/{id}").hasRole("ADMIN")
+                        .requestMatchers("/users/feignClients","/users/feignClient/{id}").hasRole("USER")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .oauth2ResourceServer(oauth -> oauth

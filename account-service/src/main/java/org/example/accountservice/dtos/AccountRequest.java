@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -15,7 +17,9 @@ import java.time.LocalDate;
     @NoArgsConstructor
     public class AccountRequest {
 
+        @NotNull(message = "idUser est obligatoire")
         private Long idUser ;
+        @NotBlank(message = "Le type de compte est obligatoire")
         private String type ;
 
     }

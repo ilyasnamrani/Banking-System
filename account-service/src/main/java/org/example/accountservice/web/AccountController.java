@@ -11,6 +11,7 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/accounts")
 public class AccountController {
     private final AccountService accountService;
@@ -38,12 +39,12 @@ public class AccountController {
     }
 
     @PostMapping("/create")
-    public AccountResponse createAccount(@RequestBody AccountRequest accountRequest){
+    public AccountResponse createAccount(@RequestBody @jakarta.validation.Valid AccountRequest accountRequest){
         return accountService.createAccount(accountRequest);
     }
 
     @PutMapping("/update/{idAccount}")
-    public  AccountResponse updateAccount(@PathVariable Long idAccount, @RequestBody AccountRequest accountRequest,@AuthenticationPrincipal Jwt jwt){
+    public  AccountResponse updateAccount(@PathVariable Long idAccount, @RequestBody @jakarta.validation.Valid AccountRequest accountRequest,@AuthenticationPrincipal Jwt jwt){
         return accountService.updateAccount(accountRequest,idAccount,jwt);
     }
 
@@ -65,6 +66,11 @@ public class AccountController {
     @GetMapping("/registration/{regId}")
     public String getAccountByRegId(@PathVariable String regId){
         return accountService.findAccountByRegistrationId(regId);
+    }
+
+    @GetMapping("/registrationId/{idAccount}")
+    public String getRegistrationId(@PathVariable Long idAccount){
+        return accountService.registrationId(idAccount);
     }
 
 

@@ -39,7 +39,7 @@ public class TransactionController {
     }
 
     @PostMapping("/create")
-    public TransactionResponse createTransaction(@RequestBody TransactionRequest transactionRequest){
+    public TransactionResponse createTransaction(@RequestBody @jakarta.validation.Valid TransactionRequest transactionRequest){
         return transactionService.createTransaction(transactionRequest);
     }
 

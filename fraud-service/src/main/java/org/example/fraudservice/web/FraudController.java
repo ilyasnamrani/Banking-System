@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/frauds")
+@CrossOrigin("*")
 public class FraudController {
     private final FraudService fraudService ;
 

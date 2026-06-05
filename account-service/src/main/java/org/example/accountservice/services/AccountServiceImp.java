@@ -9,6 +9,7 @@ import org.example.accountservice.entities.Account;
 import org.example.accountservice.mappers.AccountMapper;
 import org.example.accountservice.repo.AccountRepository;
 import org.example.accountservice.web.UserFeignClient;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -31,11 +32,15 @@ public class AccountServiceImp implements AccountService {
          this.userFeignClient = userFeignClient;
      }
     @Override
+    @Transactional
     public AccountResponse createAccount(AccountRequest account) {
         return accountMapper.toAccountResponse(accountRepository.save(accountMapper.toAccount(account)));
     }
 
+
+
     @Override
+    @Transactional
     public AccountResponse updateAccount(AccountRequest account, Long idAccount, Jwt jwt) {
         UserResponseV2 user = userFeignClient.getFeignClientUser(account.getIdUser());
         Account updated = accountRepository.findById(idAccount)
@@ -56,6 +61,7 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @Transactional
     public void deleteAccount(Long idAccount) {
        accountRepository.deleteById(idAccount);
     }
@@ -90,6 +96,16 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    public String registrationId(Long idAccount){
+         Account acc = accountRepository.findById(idAccount).orElseThrow(
+                 () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
+         );
+
+         return acc.getRegistrationId();
+    }
+
+    @Override
+    @Transactional
     public void debit(Long idAccount, Double amount) throws Exception {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
@@ -102,6 +118,7 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @Transactional
     public void credit(Long idAccount, Double amount) {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
@@ -110,6 +127,7 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @Transactional
     public void refund(Long idAccount, Double amount) {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
@@ -118,6 +136,7 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @Transactional
     public String deactivateAccount(Long idAccount) {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)
@@ -128,6 +147,7 @@ public class AccountServiceImp implements AccountService {
     }
 
     @Override
+    @Transactional
     public String activateAccount(Long idAccount) {
          Account acc = accountRepository.findById(idAccount).orElseThrow(
                  () -> new EntityNotFoundException("Account Not Found with Id : " + idAccount)

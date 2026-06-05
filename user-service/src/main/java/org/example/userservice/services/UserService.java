@@ -17,4 +17,5 @@ public interface UserService {
     public UserResponse updateUser(UserRequest userRequest  ,Long idUser, Jwt jwt);
     public void deleteUser(Long userId);
     public UserResponse getUserByCin(String cin, Jwt jwt) throws AccessDeniedException;
+    public Long getIdUserByKeycloakId(String keycloakId);
 }

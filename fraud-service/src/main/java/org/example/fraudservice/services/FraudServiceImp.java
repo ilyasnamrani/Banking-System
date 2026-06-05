@@ -3,6 +3,7 @@ package org.example.fraudservice.services;
 import jakarta.persistence.EntityNotFoundException;
 import org.example.fraudservice.entities.Fraud;
 import org.example.fraudservice.repo.FraudRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,11 +21,13 @@ public class FraudServiceImp implements FraudService{
 
 
     @Override
+    @Transactional
     public Fraud createFraud(Fraud fraud) {
         return fraudRepository.save(fraud);
     }
 
     @Override
+    @Transactional
     public void deleteFraud(Long id) {
           fraudRepository.deleteById(id);
     }

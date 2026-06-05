@@ -7,6 +7,7 @@ import org.example.userservice.dtos.UserResponseV2;
 import org.example.userservice.entities.User;
 import org.example.userservice.mappers.UserMapper;
 import org.example.userservice.repo.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,15 @@ public class UserServiceImp implements UserService  {
         this.keycloakService = keycloakService;
         this.kafkaService = kafkaService;
     }
+
+  @Override
+  public Long getIdUserByKeycloakId(String keycloakId) {
+        User user = userRepository.findByKeycloakId(keycloakId);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found in local database for Keycloak ID: " + keycloakId);
+        }
+        return user.getIdUser();
+  }
     @Override
     public UserResponse getUser(Long userId, Jwt jwt) throws AccessDeniedException {
         User user = userRepository.findById(userId).orElseThrow(
@@ -70,6 +80,7 @@ public class UserServiceImp implements UserService  {
 
 
     @Override
+    @Transactional
     public UserResponse createNewUser(UserRequest userRequest) {
         User user = userMapper.toUser(userRequest);
         user.setKeycloakId(keycloakService.createUser(user.getEmail(), userRequest.getPassword(),  user.getFirstName(), user.getLastName()));
@@ -79,6 +90,7 @@ public class UserServiceImp implements UserService  {
     }
 
     @Override
+    @Transactional
     public UserResponse updateUser(UserRequest userRequest, Long idUser, Jwt jwt) {
 
         User updated = userRepository.findById(idUser)

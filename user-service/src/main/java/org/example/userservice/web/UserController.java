@@ -1,6 +1,7 @@
 package org.example.userservice.web;
 
 
+import org.bouncycastle.i18n.LocaleString;
 import org.example.userservice.dtos.UserRequest;
 import org.example.userservice.dtos.UserResponse;
 import org.example.userservice.dtos.UserResponseV2;
@@ -26,6 +27,11 @@ public class UserController {
     @GetMapping("/{id}")
     public UserResponse getUser(@PathVariable Long id,@AuthenticationPrincipal Jwt jwt) throws AccessDeniedException {
         return userService.getUser(id,jwt);
+    }
+
+    @GetMapping("/keycloak/me")
+    public Long getMyUserId(@AuthenticationPrincipal Jwt jwt){
+        return userService.getIdUserByKeycloakId(jwt.getSubject());
     }
 
     @GetMapping("/feignClient/{id}")

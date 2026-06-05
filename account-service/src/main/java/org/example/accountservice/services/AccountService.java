@@ -22,5 +22,6 @@ public interface AccountService {
     public List<AccountResponse> getAllAccountsForUser(Long idUser , Jwt jwt);
     public List<AccountResponse> getAllAccountsForAdmin();
     //public Boolean transaction(Long fromIdAccount, Long toIdAccount, Double amount);
+    public String registrationId(Long idAccount);
 
 }

@@ -7,6 +7,7 @@ import org.example.transactionservice.entities.Transaction;
 import org.example.transactionservice.enums.Status;
 import org.example.transactionservice.mapper.TransactionMapper;
 import org.example.transactionservice.repo.TransactionRepository;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class TransactionServiceImp implements TransactionService {
     }
 
     @Override
+    @Transactional
     public TransactionResponse createTransaction(TransactionRequest transaction) {
         Transaction t = transactionMapper.toTransaction(transaction);
         transactionRepository.save(t);
@@ -37,6 +39,7 @@ public class TransactionServiceImp implements TransactionService {
     }
 
     @Override
+    @Transactional
     public void deleteTransaction(Long idTransaction) {
         transactionRepository.deleteById(idTransaction);
     }
